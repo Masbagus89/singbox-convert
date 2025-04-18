@@ -5,33 +5,32 @@
 </head>
 <body>
   <h1>Sing-box Converter</h1>
-  <textarea id="configInput" rows="10" cols="80"></textarea>
-
+  <textarea id="configInput" rows="10" cols="80"></textarea><br />
+  <button onclick="convert()">Convert</button>
+  <pre id="output"></pre>
 <div style="margin-top:10px;">
-  <button onclick="copyResult()">Copy</button>
-  <button onclick="downloadResult()">Download .bpf</button>
+  <button onclick="copyOutput()">Copy Output</button>
+  <button onclick="downloadOutput()">Download .bpf</button>
 </div>
 <script>
-function copyResult() {
-  const result = document.getElementById("result").value;
-  navigator.clipboard.writeText(result).then(() => alert("Tersalin!"));
+function copyOutput() {
+  const text = document.getElementById("output").textContent;
+  navigator.clipboard.writeText(text).then(() => alert("Output tersalin!"));
 }
 
-function downloadResult() {
-  const result = document.getElementById("result").value;
-  const blob = new Blob([result], { type: "application/json" });
+function downloadOutput() {
+  const text = document.getElementById("output").textContent;
+  const blob = new Blob([text], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "config-singbox.bpf";
+  a.download = "converted-config.bpf";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
-</script><br />
-  <button onclick="convert()">Convert</button>
-  <pre id="output"></pre>
+</script>
   <script>
     async function convert() {
       const config = document.getElementById("configInput").value;
