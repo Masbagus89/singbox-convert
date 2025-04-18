@@ -57,7 +57,7 @@
   <pre id="output"></pre>
 <div style="margin-top:10px;">
   <button onclick="copyOutput()">Copy Output</button>
-  <button onclick="downloadOutput()">Download .bpf</button>
+  <button onclick="downloadOutput()">Download .txt</button>
 </div>
 <script>
 function copyOutput() {
@@ -71,7 +71,7 @@ function downloadOutput() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "converted-config.bpf";
+  a.download = "singbox-mosyaf.txt";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
