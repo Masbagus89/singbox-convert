@@ -1,22 +1,25 @@
-import { Buffer } from "buffer";
+import { Buffer } from 'buffer';
 
-export default function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
+export async function POST(req) {
   try {
-    const { config } = req.body;
+    const { config } = await req.json();
 
-    if (!config) throw new Error("No config provided");
+    if (!config) {
+      return new Response(JSON.stringify({ error: 'No config provided' }), { status: 400 });
+    }
 
-    if (config.startsWith("vmess://")) {
-      const base64 = config.replace("vmess://", "");
-      const jsonStr = Buffer.from(base64, "base64").toString("utf-8");
-      const parsed = JSON.parse(jsonStr);
+    if (config.startsWith('vmess://')) {
+      const base64 = config.replace('vmess://', '');
+      const jsonStr = Buffer.from(base64, 'base64').toString('utf-8');
+      let parsed;
+
+      try {
+        parsed = JSON.parse(jsonStr);
+      } catch {
+        return new Response(JSON.stringify({ error: 'Invalid JSON in VMess config' }), { status: 400 });
+      }
 
       const result = {
-        inbounds: [],
         outbounds: [
           {
             type: "vmess",
@@ -37,12 +40,42 @@ export default function handler(req, res) {
           }
         ]
       };
-      return res.status(200).json(result);
+
+      return new Response(JSON.stringify(result), { status: 200 });
     }
 
-    return res.status(400).json({ error: "Unsupported config type" });
+    if (config.startsWith('vless://') || config.startsWith('trojan://')) {
+      const isTrojan = config.startsWith('trojan://');
+      const url = new URL(config);
+      const tag = 'proxy';
+
+      const result = {
+        outbounds: [
+          {
+            type: isTrojan ? 'trojan' : 'vless',
+            tag,
+            server: url.hostname,
+            server_port: parseInt(url.port),
+            uuid: isTrojan ? undefined : url.username,
+            password: isTrojan ? url.username : undefined,
+            tls: url.searchParams.get("security") === "tls",
+            network: url.searchParams.get("type") || "tcp",
+            ws_opts: url.searchParams.get("type") === "ws" ? {
+              path: url.searchParams.get("path") || "/",
+              headers: {
+                Host: url.searchParams.get("host") || url.hostname
+              }
+            } : undefined
+          }
+        ]
+      };
+
+      return new Response(JSON.stringify(result), { status: 200 });
+    }
+
+    return new Response(JSON.stringify({ error: 'Unsupported config type' }), { status: 400 });
 
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return new Response(JSON.stringify({ error: err.message || 'Internal Server Error' }), { status: 500 });
   }
 }
