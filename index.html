@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sing-box Converter</title>
+</head>
+<body>
+  <h1>Sing-box Converter</h1>
+  <textarea id="configInput" rows="10" cols="80"></textarea><br />
+  <button onclick="convert()">Convert</button>
+  <pre id="output"></pre>
+  <script>
+    async function convert() {
+      const config = document.getElementById("configInput").value;
+      const res = await fetch("/api/convert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ config })
+      });
+      const data = await res.json();
+      document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
