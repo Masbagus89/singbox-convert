@@ -31,11 +31,27 @@
       font-size: 16px;
       cursor: pointer;
     }
-  </style>
+      textarea, pre {
+      border: 2px solid orange;
+      box-shadow: 0 4px 8px rgba(255, 165, 0, 0.3);
+      border-radius: 8px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+</style>
   <title>Sing-box Converter</title>
 </head>
 <body>
-  <h1>Sing-box Converter</h1>
+  <h1 style="color: #007bff;">Sing-box Converter</h1>
   <textarea id="configInput" rows="10" cols="80"></textarea><br />
   <button onclick="convert()">Convert</button>
   <pre id="output"></pre>
